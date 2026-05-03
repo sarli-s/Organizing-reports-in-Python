@@ -43,12 +43,14 @@ class BaseRenderer(ABC):
 
     def _convert_to_pdf(self, html_path: str, report: AttendanceReport) -> str:
         import pdfkit
+        import platform
         pdf_path = os.path.join(self.output_dir, f"{self._filename_base(report)}.pdf")
-        config = pdfkit.configuration(
-            wkhtmltopdf=r"C:\Program Files\לימוד שיטה עיורת\RapidTyping\wkhtmltopdf.exe"
-            #wkhtmltopdf='/usr/bin/wkhtmltopdf'
-
+        wkhtmltopdf_path = (
+            r"C:\Program Files\לימוד שיטה עיורת\RapidTyping\wkhtmltopdf.exe"
+            if platform.system() == "Windows"
+            else "/usr/bin/wkhtmltopdf"
         )
+        config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
         pdfkit.from_file(html_path, pdf_path, configuration=config)
         print(f"[Renderer] PDF saved: {pdf_path}")
         return pdf_path

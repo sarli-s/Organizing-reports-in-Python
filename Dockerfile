@@ -5,7 +5,7 @@ ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
 # הגדרת נתיב הנתונים הסטנדרטי בלינוקס
-ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/tessdata/
+ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata
 
 
 # התקנת תלויות מערכת
