@@ -1,61 +1,54 @@
-# FROM python:3.11-slim
+FROM python:3.11-slim-bookworm
 
-# # Install system dependencies
-# RUN apt-get update && apt-get install -y \
-#     tesseract-ocr \
-#     tesseract-ocr-heb \
-#     poppler-utils \
-#     libglib2.0-0 \
-#     libsm6 \
-#     libxrender1 \
-#     libxext6 \
-#     libgl1 \
-#     xfonts-75dpi \
-#     xfonts-base \
-#     fontconfig \
-#     && apt-get clean \
-#     && rm -rf /var/lib/apt/lists/*
+# הגדרת משתני סביבה לעברית
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
 
-# # Install wkhtmltopdf from local file
-# COPY wkhtmltox_0.12.6.1-3.bookworm_amd64.deb /tmp/
-# RUN apt-get update && apt-get install -y /tmp/wkhtmltox_0.12.6.1-3.bookworm_amd64.deb \
-#     && rm /tmp/wkhtmltox_0.12.6.1-3.bookworm_amd64.deb \
-#     && apt-get clean \
-#     && rm -rf /var/lib/apt/lists/*
+# הגדרת נתיב הנתונים הסטנדרטי בלינוקס
+ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/tessdata/
 
-# WORKDIR /app
 
-# COPY requirements.txt .
-# RUN pip install --no-cache-dir --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
-
-# COPY . .
-
-# RUN mkdir -p /output
-
-# ENTRYPOINT ["python", "main.py"]
-# CMD ["--help"]
-
-# בסיס - Python עם כלים למערכת
-FROM python:3.11-slim
-
-# התקנת תלויות מערכת (נדרש עבור tesseract, opencv, pdf2image)
+# התקנת תלויות מערכת
 RUN apt-get update && apt-get install -y \
+    wget \
+    ca-certificates \
     tesseract-ocr \
     tesseract-ocr-heb \
     poppler-utils \
     libgl1 \
     libglib2.0-0 \
+    # הוספת פונטים קריטית לעברית
+    fonts-noto-core \
+    fonts-freefont-ttf \
+    fontconfig \
+    # תלויות לעיבוד תמונה וקובצי PDF
+    libmagic1 \
+    wkhtmltopdf \
     && rm -rf /var/lib/apt/lists/*
 
-# תיקיית עבודה בתוך הקונטיינר
+# # וידוא שהנתיב קיים ויש בו את קבצי השפה
+# RUN mkdir -p /usr/share/tesseract-ocr/tessdata
+
+# יצירת תיקיית קישור לביטחון (אם הספרייה מחפשת תחת תיקיית "5")
+RUN mkdir -p /usr/share/tesseract-ocr/5/ && \
+    ln -s /usr/share/tesseract-ocr/tessdata /usr/share/tesseract-ocr/5/tessdata || true
+
+# # פקודה זו מוודא שגם אם המערכת התקינה את זה במיקום אחר, הקישור יהיה תקין
+# RUN ln -s /usr/share/tesseract-ocr/tessdata /usr/share/tesseract-ocr/5/tessdata || true
+
+
+# רענון מאגר הפונטים במערכת
+RUN fc-cache -f -v
+
 WORKDIR /app
 
-# העתק requirements והתקן תחילה (cache layer)
+# יצירת תיקיית פלט
+RUN mkdir -p /app/output && chmod 777 /app/output
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
 
-# העתק את שאר קבצי הפרויקט
 COPY . .
 
-# הפקודה להרצה
-CMD ["python", "main.py"]
+# וודאי שהפקודה הזו מתאימה לשם הקובץ הראשי שלך
+ENTRYPOINT ["python", "main.py"]

@@ -1,5 +1,8 @@
 class DocumentClassifier:
     def classify(self, raw_text):
+
+        print(f"DEBUG OCR TEXT: '{raw_text[:200]}'")
+        raw_text = raw_text or ""
         # סימנים ייחודיים לסוג A (נמצאים בטבלאות של a_r_9 ו-a_r_25)
         a_indicators = ["הפסקה", "% 125", "% 150", "100%", "מקום"]
         

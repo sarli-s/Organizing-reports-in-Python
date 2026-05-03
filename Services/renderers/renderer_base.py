@@ -46,6 +46,8 @@ class BaseRenderer(ABC):
         pdf_path = os.path.join(self.output_dir, f"{self._filename_base(report)}.pdf")
         config = pdfkit.configuration(
             wkhtmltopdf=r"C:\Program Files\לימוד שיטה עיורת\RapidTyping\wkhtmltopdf.exe"
+            #wkhtmltopdf='/usr/bin/wkhtmltopdf'
+
         )
         pdfkit.from_file(html_path, pdf_path, configuration=config)
         print(f"[Renderer] PDF saved: {pdf_path}")
