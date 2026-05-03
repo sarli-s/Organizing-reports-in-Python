@@ -60,13 +60,9 @@ import os
 if platform.system() == "Windows":
     pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
     POPPLER_PATH = r'C:\Program Files\poppler\poppler-24.02.0\Library\bin'
-    TESSDATA_CONFIG = '--psm 6'
 else:
-    # הגדרות ללינוקס (בתוך דוקר)
-    POPPLER_PATH = "/usr/bin"
-    # משיכת הנתיב ממשתנה הסביבה שהגדרנו בדוקר
-    tessdata_dir = os.environ.get("TESSDATA_PREFIX", "/usr/share/tesseract-ocr/tessdata")
-    TESSDATA_CONFIG = f'--tessdata-dir "{tessdata_dir}" --psm 6'
+    POPPLER_PATH = None
+TESSDATA_CONFIG = '--psm 6'
 
 class PDFToTextExtractor:
     def process_pdf(self, pdf_path):
